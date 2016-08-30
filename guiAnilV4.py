@@ -136,22 +136,29 @@ class guiLogic(Ui_prepare2Pg):
 
     def updateLcd(self):
         ##http://stackoverflow.com/questions/775049/python-time-seconds-to-hms
-        # this function increments the self.timerValue variable which is converted to hh:mm:ss 
+        # this function decrements the self.timerValue variable which is converted to hh:mm:ss 
         m, s = divmod(self.timerValue, 60)
         h, m = divmod(m, 60)
+        if s<10:
+           s= "0"+str(s)
+        if m<10:
+            m="0"+str(m)
+        if h<10:
+            h ="0"+str(h)
         self.time = str(h) + ':' + str(m)+':'+str(s) 
         ui.lcdNumber.display(self.time)
-        self.timerValue = self.timerValue + 1
+        self.timerValue = self.timerValue - 1
 
     def startTimer(self):
         #Start the timer at the Begining of the Test
-        #for every 1 sec call the updateLcd Function 
+        #for every 1 sec call the updateLcd Function
+        self.timerValue = 300 # the test time should be retrieved here
         ui.lcdNumber.setDigitCount(8)
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.updateLcd)
         self.timer.start(1000) 
         ui.lcdNumber.show() 
-        ui.lcdNumber.display('0:0:0')
+        ui.lcdNumber.display('00:00:00')
     
     def setupLogic(self):
         #Assign the Duties for Buttons
@@ -243,7 +250,7 @@ class guiLogic(Ui_prepare2Pg):
                     <img src="'''+os.getcwd()+'''/temp/123.png">
                     </body>
                     </html>'''
-        ui.QuestionLabel.setHtml(html)
+        ui.QuestionLabel.setHtml(html) # QWebview widget added and html tags tried and worked properly
         #img = open('123.png', 'rb').read()
         #ui.QuestionLabel.setContent(img, 'image/png')
         #ui.QuestionLabel.setText(_translate("prepare2Pg", newLogic.data.queDict[str(QIndex)], None))
