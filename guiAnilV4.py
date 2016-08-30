@@ -1,6 +1,6 @@
-#Author : Kunchala Anil,Tanniru Surendra
-#Date : 30 Aug 2016
-#Email : anilkunchalaece@gmail.com,tsurendraexam@gmail.com
+#Author : Kunchala Anil
+#Date : 28 Aug 2016
+#Email : anilkunchalaece@gmail.com
 
 #Check the Automatic Button Genration Clearly - Ref guiAnilV3.py
 
@@ -12,6 +12,7 @@ import csv
 from testData import TestData
 #Import the PyQt Core and Gui Libraries
 from PyQt4 import QtCore, QtGui
+import os
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -234,7 +235,18 @@ class guiLogic(Ui_prepare2Pg):
         #where Qindex is Key value in Data
         #using key values we set the Text of Question label and optA,B,C and D Radio Buttons 
         ui.testNameLabel.setText(_translate("prepare2Pg", "TEST NAME", None))
-        ui.QuestionLabel.setText(_translate("prepare2Pg", newLogic.data.queDict[str(QIndex)], None))
+        html = '''<html>
+                    <head>
+                    <title>A Sample Page</title>
+                    </head>
+                    <body>
+                    <img src="'''+os.getcwd()+'''/temp/123.png">
+                    </body>
+                    </html>'''
+        ui.QuestionLabel.setHtml(html)
+        #img = open('123.png', 'rb').read()
+        #ui.QuestionLabel.setContent(img, 'image/png')
+        #ui.QuestionLabel.setText(_translate("prepare2Pg", newLogic.data.queDict[str(QIndex)], None))
         ui.optARadioButton.setText(_translate("prepare2Pg", newLogic.data.optADict[str(QIndex)], None))
         ui.optBRadioButton.setText(_translate("prepare2Pg", newLogic.data.optBDict[str(QIndex)], None))
         ui.optCRadioButton.setText(_translate("prepare2Pg", newLogic.data.optCDict[str(QIndex)], None))
