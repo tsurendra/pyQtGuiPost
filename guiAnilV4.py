@@ -12,7 +12,8 @@ import csv
 from testData import TestData
 #Import the PyQt Core and Gui Libraries
 from PyQt4 import QtCore, QtGui
-import os
+import os  # to get the files path etc..
+import shutil # to remove temporary directory after exam ending
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -136,29 +137,22 @@ class guiLogic(Ui_prepare2Pg):
 
     def updateLcd(self):
         ##http://stackoverflow.com/questions/775049/python-time-seconds-to-hms
-        # this function decrements the self.timerValue variable which is converted to hh:mm:ss 
+        # this function increments the self.timerValue variable which is converted to hh:mm:ss 
         m, s = divmod(self.timerValue, 60)
         h, m = divmod(m, 60)
-        if s<10:
-           s= "0"+str(s)
-        if m<10:
-            m="0"+str(m)
-        if h<10:
-            h ="0"+str(h)
         self.time = str(h) + ':' + str(m)+':'+str(s) 
         ui.lcdNumber.display(self.time)
-        self.timerValue = self.timerValue - 1
+        self.timerValue = self.timerValue + 1
 
     def startTimer(self):
         #Start the timer at the Begining of the Test
-        #for every 1 sec call the updateLcd Function
-        self.timerValue = 300 # the test time should be retrieved here
+        #for every 1 sec call the updateLcd Function 
         ui.lcdNumber.setDigitCount(8)
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.updateLcd)
         self.timer.start(1000) 
         ui.lcdNumber.show() 
-        ui.lcdNumber.display('00:00:00')
+        ui.lcdNumber.display('0:0:0')
     
     def setupLogic(self):
         #Assign the Duties for Buttons
@@ -226,7 +220,7 @@ class guiLogic(Ui_prepare2Pg):
         print "endTest Btn Pressed"
         print "Output Dict is "
         print self.resultDict
-
+        shutil.rmtree("temp") # delete the temporary directory
     def previousFcn(self):
         #when previous btn is clicked decrement the Qindex value and Display the respective Question using Qindex
         print "Previous Btn Pressed"
@@ -242,16 +236,31 @@ class guiLogic(Ui_prepare2Pg):
         #where Qindex is Key value in Data
         #using key values we set the Text of Question label and optA,B,C and D Radio Buttons 
         ui.testNameLabel.setText(_translate("prepare2Pg", "TEST NAME", None))
-        html = '''<html>
-                    <head>
-                    <title>A Sample Page</title>
-                    </head>
-                    <body>
-                    <img src="'''+os.getcwd()+'''/temp/123.png">
-                    <p>this is a question</p>
-                    </body>
-                    </html>'''
-        ui.QuestionLabel.setHtml(html) # QWebview widget added and html tags tried and worked properly
+
+        #for Question first we are checking the type of Question whether it is a img oriented q?
+        x = str(newLogic.data.queDict[str(QIndex)])
+        y = str(QIndex)
+
+        if(x==y):  # if the key and value are same then its a img oriented question
+            html = '''<html>
+                        <head>
+                        <title>A Sample Page</title>
+                        </head>
+                        <body>
+                        <img src="'''+os.getcwd()+'''/temp/'''+str(newLogic.data.keyDict[str(QIndex)])+'''.png" align="middle">
+                        '''+str(newLogic.data.imgQueDict[str(QIndex)][0])+'''
+                        </body>
+                        </html>'''
+        else:
+             html =  '''<html>
+                        <head>
+                        <title>A Sample Page</title>
+                        </head>
+                        <body><p style="position: fixed; bottom: 0; width:100%;"><b>Q:)</b>
+                        '''+str(newLogic.data.queDict[str(QIndex)])+'''
+                        </p></body>
+                        </html>'''
+        ui.QuestionLabel.setHtml(html)
         #img = open('123.png', 'rb').read()
         #ui.QuestionLabel.setContent(img, 'image/png')
         #ui.QuestionLabel.setText(_translate("prepare2Pg", newLogic.data.queDict[str(QIndex)], None))
@@ -276,13 +285,23 @@ class guiLogic(Ui_prepare2Pg):
 
 if __name__ == "__main__":
     import sys
+    import os
+    import urllib2, urllib
     app = QtGui.QApplication(sys.argv)
     MainWindow = QtGui.QMainWindow()
     ui = Ui_prepare2Pg()
     ui.setupUi(MainWindow)
     MainWindow.show()
     newLogic = guiLogic()
-    newLogic.retranslateUi(newLogic.questionIndex)
+
+    os.mkdir("temp")  # create a temp directory ref http://www.tutorialspoint.com/python/python_files_io.htm
     
+    #download all the image files in questions data to temporary directory
+    for key in newLogic.data.imgUrlDict:
+        #print key+":"+newLogic.data.imgUrlDict[key]
+        #print newLogic.data.imgQueDict[key][0]
+        urllib.urlretrieve(newLogic.data.imgUrlDict[key],os.getcwd()+"/temp/"+str(newLogic.data.keyDict[key])+".png")
+    newLogic.retranslateUi(newLogic.questionIndex)
+   
     sys.exit(app.exec_())
     
