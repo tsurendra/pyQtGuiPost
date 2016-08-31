@@ -248,6 +248,7 @@ class guiLogic(Ui_prepare2Pg):
                     </head>
                     <body>
                     <img src="'''+os.getcwd()+'''/temp/123.png">
+                    <p>this is a question</p>
                     </body>
                     </html>'''
         ui.QuestionLabel.setHtml(html) # QWebview widget added and html tags tried and worked properly
